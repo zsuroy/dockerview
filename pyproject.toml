@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dockerview"
+version = "0.1.0"
+description = "A simple terminal-based Docker performance monitor."
+readme = "README.md"
+authors = [
+  { name = "Suroy", email = "suroy@qq.com" },
+]
+license = { text = "MIT" }
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+]
+keywords = ["docker", "monitor", "terminal", "rich"]
+dependencies = [
+    "docker>=7.1.0",
+    "rich>=14.2.0",
+]
+
+[project.scripts]
+dockerview = "dockerview.cli:main"
+
+[project.urls]
+"Homepage" = "https://github.com/zsuroy/dockerview"
+"Documentation" = "https://github.com/zsuroy/dockerview/blob/main/README.md"
+
+[project.optional-dependencies]
+dev = [
+    "build",
+    "twine",
+    "pytest",
+]
