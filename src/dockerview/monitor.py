@@ -5,6 +5,7 @@ import subprocess
 
 
 class DockerMonitor:
+
     def __init__(self):
         self.client = self._connect_to_docker()
 
@@ -13,7 +14,6 @@ class DockerMonitor:
         Attempt to connect to Docker daemon using multiple strategies.
         Last Resort: Ask the docker CLI where the socket is.
         """
-        # Strategy 1: Environment variables (Standard)
         try:
             client = docker.from_env()
             client.ping()
@@ -23,7 +23,6 @@ class DockerMonitor:
 
         possible_urls = []
 
-        # Strategy 2: Common paths (Guessing)
         if sys.platform.startswith("win"):
             possible_urls.append("npipe:////./pipe/docker_engine")
         else:
@@ -34,10 +33,8 @@ class DockerMonitor:
             # Mac Docker Desktop (Alternative)
             possible_urls.append(f"unix://{os.path.expanduser('~')}/.docker/desktop/docker.sock")
 
-        # Strategy 3: Ask the Docker CLI directly (The "Nuclear" Option)
-        # If 'docker ps' works, this MUST work.
         try:
-            # Run 'docker context inspect' to find the host endpoint
+            # Run command to find the host endpoint
             cmd = "docker context inspect --format '{{.Endpoints.docker.Host}}'"
             result = subprocess.check_output(cmd, shell=True, stderr=subprocess.DEVNULL).decode().strip()
             if result:
@@ -49,10 +46,8 @@ class DockerMonitor:
 
         for url in possible_urls:
             try:
-                # Force cleanup of the URL string
                 url = url.strip("'").strip('"')
 
-                # Setup client
                 client = docker.DockerClient(base_url=url)
                 client.ping()
                 return client

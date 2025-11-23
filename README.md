@@ -33,11 +33,6 @@ DockerView Monitor (Press Ctrl+C to exit)
 └────────────┴──────────────────┴──────────┴────────┴──────────────┘
 ```
 
-## Requirements
-- Docker Engine
-- Python 3.8+
-- Rich library (>=13.0.0)
-- Docker SDK for Python (>=6.0.0)
 
 ## Project Structure
 ```
