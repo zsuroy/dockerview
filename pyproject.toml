@@ -37,3 +37,13 @@ dev = [
     "twine",
     "pytest",
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+dockerview = ["py.typed"]
+
+[tool.setuptools.dynamic]
+version = {attr = "dockerview.__version__"}

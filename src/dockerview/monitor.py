@@ -88,6 +88,21 @@ class DockerMonitor:
     def bytes_to_mb(self, size_in_bytes):
         return round(size_in_bytes / (1024 * 1024), 2)
 
+    def get_network_stats(self, stats):
+        """Calculate network usage statistics."""
+        networks = stats.get("networks", {})
+        rx_bytes = 0
+        tx_bytes = 0
+        
+        for iface in networks.values():
+            rx_bytes += iface.get("rx_bytes", 0)
+            tx_bytes += iface.get("tx_bytes", 0)
+            
+        return {
+            "rx": self.bytes_to_mb(rx_bytes),
+            "tx": self.bytes_to_mb(tx_bytes)
+        }
+
     def get_all_stats(self):
         """Get a snapshot of statistics for all running containers."""
         results = []
@@ -103,13 +118,15 @@ class DockerMonitor:
                 mem_pct = self.calculate_mem_percent(stats)
                 mem_usage = self.bytes_to_mb(stats["memory_stats"].get("usage", 0))
                 mem_limit = self.bytes_to_mb(stats["memory_stats"].get("limit", 0))
+                network_stats = self.get_network_stats(stats)
 
                 results.append({
                     "id": container.short_id,
                     "name": container.name,
                     "status": container.status,
                     "cpu": f"{cpu_pct}%",
-                    "memory": f"{mem_usage}MB / {mem_limit}MB ({mem_pct}%)"
+                    "memory": f"{mem_usage}MB / {mem_limit}MB ({mem_pct}%)",
+                    "network": f"RX: {network_stats['rx']}MB | TX: {network_stats['tx']}MB"
                 })
             except Exception:
                 continue

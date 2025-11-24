@@ -16,6 +16,7 @@ def generate_table(monitor):
     table.add_column("Status", style="green")
     table.add_column("CPU %", justify="right")
     table.add_column("Memory Usage", justify="right")
+    table.add_column("Network", justify="right")
 
     stats_list = monitor.get_all_stats()
 
@@ -25,7 +26,8 @@ def generate_table(monitor):
             stat["name"],
             stat["status"],
             stat["cpu"],
-            stat["memory"]
+            stat["memory"],
+            stat["network"]
         )
 
     return table
