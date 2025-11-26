@@ -103,6 +103,24 @@ class DockerMonitor:
             "tx": self.bytes_to_mb(tx_bytes)
         }
 
+    def get_blkio_stats(self, stats):
+        """Calculate block usage statistics."""
+        blkio = stats.get("blkio_stats", {})
+        blkio_stats = blkio.get("io_service_bytes_recursive", [])
+        read_bytes = 0
+        write_bytes = 0
+
+        for i in blkio_stats:
+            if i.get("op", "") == "read":
+                read_bytes += i.get("value", 0)
+            else:
+                write_bytes += i.get("value", 0)
+
+        return {
+            "read": self.bytes_to_mb(read_bytes),
+            "write": self.bytes_to_mb(write_bytes)
+        }
+
     def get_all_stats(self):
         """Get a snapshot of statistics for all running containers."""
         results = []
@@ -119,6 +137,7 @@ class DockerMonitor:
                 mem_usage = self.bytes_to_mb(stats["memory_stats"].get("usage", 0))
                 mem_limit = self.bytes_to_mb(stats["memory_stats"].get("limit", 0))
                 network_stats = self.get_network_stats(stats)
+                blkio_stats = self.get_blkio_stats(stats)
 
                 results.append({
                     "id": container.short_id,
@@ -126,7 +145,8 @@ class DockerMonitor:
                     "status": container.status,
                     "cpu": f"{cpu_pct}%",
                     "memory": f"{mem_usage}MB / {mem_limit}MB ({mem_pct}%)",
-                    "network": f"RX: {network_stats['rx']}MB | TX: {network_stats['tx']}MB"
+                    "network": f"RX: {network_stats['rx']}MB | TX: {network_stats['tx']}MB",
+                    "blkio": f"READ: {blkio_stats['read']}MB | WRITE: {blkio_stats['write']}MB"
                 })
             except Exception:
                 continue
